@@ -1,3 +1,4 @@
+from functools import partial
 from django.shortcuts import get_object_or_404
 
 
@@ -26,7 +27,7 @@ def song_list(request):
         
     
 
-@api_view(['GET','PUT', 'DELETE'])                
+@api_view(['GET','PUT', 'DELETE','PATCH'])                
 def song_detail(request, pk):
     song = get_object_or_404(Song, pk=pk)
     if request.method == 'GET':
@@ -40,6 +41,19 @@ def song_detail(request, pk):
     elif request.method == 'DELETE':
             song.delete()
             return Response(status.HTTP_204_NO_CONTENT)
+    elif request.method =='PATCH':
+        song.likes += 1 
+        serializer = SongSerializer(song, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        return Response(serializer.data)
+        
+        
+    # elif PATCH
+    # line 31 holds are song object in song variable 
+    # we need to take song.likes =+ 1 
+    # then we want pass this into the serializer and save 
 
 
     
